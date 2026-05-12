@@ -2,7 +2,9 @@
  * Run once to seed the DB with hand-curated trends.
  * Usage: npx tsx lib/seed.ts
  */
-import { sql } from "./db";
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon(process.env.DATABASE_URL!);
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -117,7 +119,7 @@ async function seed() {
   for (const t of trends) {
     const firstSeen = daysAgo(t.days_back);
 
-    const { rows } = await sql`
+    const rows = await sql`
       INSERT INTO trends (
         korean_name, english_name, description, category, subcategory,
         first_seen_at, last_seen_at, is_active, rank, volume_score

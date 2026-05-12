@@ -4,7 +4,7 @@ import { mockTrends } from "@/lib/mock-data";
 import { getTrends } from "@/lib/trends";
 
 async function loadTrends() {
-  if (!process.env.POSTGRES_URL) return mockTrends;
+  if (!process.env.DATABASE_URL) return mockTrends;
   try {
     return await getTrends();
   } catch {

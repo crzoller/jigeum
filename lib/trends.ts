@@ -1,21 +1,8 @@
 import { sql } from "./db";
 import { Trend } from "./mock-data";
 
-type TrendRow = {
-  id: number;
-  rank: number;
-  korean_name: string;
-  english_name: string;
-  description: string;
-  category: string;
-  subcategory: string;
-  days_trending: number;
-  volume_score: number;
-  snapshots: number[];
-};
-
 async function getSnapshotsForTrend(trendId: number): Promise<number[]> {
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT volume
     FROM trend_snapshots
     WHERE trend_id = ${trendId}
@@ -34,7 +21,7 @@ async function getSnapshotsForTrend(trendId: number): Promise<number[]> {
 }
 
 export async function getTrends(category?: string): Promise<Trend[]> {
-  const { rows } = category && category !== "All"
+  const rows = category && category !== "All"
     ? await sql`
         SELECT * FROM trends_with_days
         WHERE category = ${category}
@@ -57,7 +44,7 @@ export async function getTrends(category?: string): Promise<Trend[]> {
         category: row.category as string,
         subcategory: (row.subcategory ?? "") as string,
         days_trending: Number(row.days_trending),
-        volume_score: row.volume_score ?? 0,
+        volume_score: (row.volume_score ?? 0) as number,
         snapshots,
       };
     })
@@ -65,5 +52,3 @@ export async function getTrends(category?: string): Promise<Trend[]> {
 
   return trends;
 }
-
-export type { TrendRow };
