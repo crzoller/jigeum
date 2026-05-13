@@ -1,0 +1,37 @@
+export type YouTubeVideo = {
+  title: string;
+  channelTitle: string;
+  description: string;
+  tags: string[];
+  viewCount: string;
+  likeCount: string;
+};
+
+export async function fetchKoreaTrendingVideos(): Promise<YouTubeVideo[]> {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) throw new Error("YOUTUBE_API_KEY is not set");
+
+  // Fetch top 20 trending videos in South Korea (regionCode=KR)
+  const listUrl = new URL("https://www.googleapis.com/youtube/v3/videos");
+  listUrl.searchParams.set("part", "snippet,statistics");
+  listUrl.searchParams.set("chart", "mostPopular");
+  listUrl.searchParams.set("regionCode", "KR");
+  listUrl.searchParams.set("maxResults", "20");
+  listUrl.searchParams.set("key", apiKey);
+
+  const res = await fetch(listUrl.toString());
+  if (!res.ok) {
+    throw new Error(`YouTube API error: ${res.status} ${await res.text()}`);
+  }
+
+  const data = await res.json();
+
+  return (data.items ?? []).map((item: any) => ({
+    title: item.snippet?.title ?? "",
+    channelTitle: item.snippet?.channelTitle ?? "",
+    description: (item.snippet?.description ?? "").slice(0, 300),
+    tags: item.snippet?.tags ?? [],
+    viewCount: item.statistics?.viewCount ?? "0",
+    likeCount: item.statistics?.likeCount ?? "0",
+  }));
+}
