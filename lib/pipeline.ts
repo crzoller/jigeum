@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { fetchKoreaTrendingVideos } from "./youtube";
+import { fetchNaverTrends } from "./naver";
 import { categorizeTrends, TrendInput } from "./claude";
 
 export async function runPipeline(): Promise<{ inserted: number; updated: number; deactivated: number }> {
@@ -10,26 +11,33 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
   const videos = await fetchKoreaTrendingVideos();
   console.log(`  → Got ${videos.length} videos`);
 
-  console.log("Step 2: Sending to Claude for categorization...");
-  const trends = await categorizeTrends(videos);
+  console.log("Step 2: Fetching Naver search trends...");
+  let naverKeywords: { keyword: string; ratio: number }[] = [];
+  try {
+    naverKeywords = await fetchNaverTrends();
+    console.log(`  → Got ${naverKeywords.length} Naver keywords`);
+  } catch (err) {
+    console.warn("  ⚠ Naver fetch failed, continuing with YouTube only:", err);
+  }
+
+  console.log("Step 3: Sending to Claude for categorization...");
+  const trends = await categorizeTrends(videos, naverKeywords);
   console.log(`  → Got ${trends.length} trends back`);
 
   let inserted = 0;
   let updated = 0;
 
-  console.log("Step 3: Upserting trends into database...");
+  console.log("Step 4: Upserting trends into database...");
   for (let i = 0; i < trends.length; i++) {
     const t = trends[i] as TrendInput;
     const rank = i + 1;
 
-    // Check if this trend already exists (match on korean_name)
     const existing = await sql`
       SELECT id FROM trends WHERE korean_name = ${t.korean_name} LIMIT 1
     `;
 
     if (existing.length > 0) {
       const trendId = existing[0].id as number;
-      // Update existing trend
       await sql`
         UPDATE trends SET
           english_name = ${t.english_name},
@@ -43,7 +51,6 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
           updated_at = NOW()
         WHERE id = ${trendId}
       `;
-      // Insert snapshot
       await sql`
         INSERT INTO trend_snapshots (trend_id, date, volume)
         VALUES (${trendId}, ${today}, ${t.volume_score})
@@ -52,7 +59,6 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
       updated++;
       console.log(`  ✓ Updated: ${t.korean_name}`);
     } else {
-      // Insert new trend
       const newTrend = await sql`
         INSERT INTO trends (
           korean_name, english_name, description, category, subcategory,
@@ -65,7 +71,6 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
         RETURNING id
       `;
       const trendId = newTrend[0].id as number;
-      // Insert first snapshot
       await sql`
         INSERT INTO trend_snapshots (trend_id, date, volume)
         VALUES (${trendId}, ${today}, ${t.volume_score})
