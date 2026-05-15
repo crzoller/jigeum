@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import TopBar from "@/components/TopBar";
 import TrendFeed from "@/components/TrendFeed";
 import { mockTrends } from "@/lib/mock-data";
