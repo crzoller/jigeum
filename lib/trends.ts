@@ -9,7 +9,6 @@ async function getSnapshotsForTrend(trendId: number): Promise<number[]> {
     ORDER BY date DESC
     LIMIT 4
   `;
-  // Reverse to get chronological order (oldest → newest), pad left if < 4
   const values = rows.map((r) => r.volume as number).reverse();
   const padded = Array(4)
     .fill(0)
@@ -46,6 +45,8 @@ export async function getTrends(category?: string): Promise<Trend[]> {
         days_trending: Number(row.days_trending),
         volume_score: (row.volume_score ?? 0) as number,
         snapshots,
+        youtube_video_id: (row.youtube_video_id ?? null) as string | null,
+        image_url: (row.image_url ?? null) as string | null,
       };
     })
   );

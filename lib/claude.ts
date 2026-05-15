@@ -1,6 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { YouTubeVideo } from "./youtube";
-import { NaverTrend } from "./naver";
+
+export type YouTubeVideoWithId = {
+  id: string;
+  title: string;
+  channelTitle: string;
+  description: string;
+  tags: string[];
+  viewCount: string;
+  likeCount: string;
+};
 
 export type TrendInput = {
   korean_name: string;
@@ -9,6 +17,7 @@ export type TrendInput = {
   category: string;
   subcategory: string;
   volume_score: number;
+  youtube_video_id: string | null;
 };
 
 const client = new Anthropic({
@@ -24,6 +33,7 @@ For each trend, provide:
 - category: exactly one of [Food, Music, Fashion, Memes, Lifestyle, Entertainment]
 - subcategory: a more specific tag (e.g. "K-pop", "Street food", "TV drama", "Viral video", "Fitness")
 - volume_score: integer 0-100 representing relative trend strength based on view counts and search ratios
+- youtube_video_id: the YouTube video ID (e.g. "dQw4w9WgXcQ") of the most representative video for this trend from the list provided. Use null if no YouTube video matches.
 
 Rules:
 - Consolidate similar items (e.g. multiple videos from one K-pop group = one trend)
@@ -34,13 +44,13 @@ Rules:
 - Return ONLY a valid JSON array. No preamble, no markdown fences, no explanation.`;
 
 export async function categorizeTrends(
-  videos: YouTubeVideo[],
+  videos: YouTubeVideoWithId[],
   naverKeywords: { keyword: string; ratio: number }[] = []
 ): Promise<TrendInput[]> {
   const youtubeData = videos
     .map(
       (v, i) =>
-        `${i + 1}. Title: ${v.title} | Channel: ${v.channelTitle} | Views: ${v.viewCount} | Tags: ${v.tags.slice(0, 5).join(", ")}`
+        `${i + 1}. ID: ${v.id} | Title: ${v.title} | Channel: ${v.channelTitle} | Views: ${v.viewCount} | Tags: ${v.tags.slice(0, 5).join(", ")}`
     )
     .join("\n");
 
@@ -59,7 +69,7 @@ export async function categorizeTrends(
         role: "user",
         content: `Here is today's trending data from South Korea. Analyze both sources and return structured trend objects.
 
-## YouTube Korea Trending Videos:
+## YouTube Korea Trending Videos (include the video ID in your response):
 ${youtubeData}
 
 ## Naver Search Term Trends (Korea):

@@ -9,6 +9,8 @@ export type Trend = {
   days_trending: number;
   volume_score: number;
   snapshots: number[];
+  youtube_video_id?: string | null;
+  image_url?: string | null;
 };
 
 export const CATEGORIES = [

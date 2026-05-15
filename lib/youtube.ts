@@ -1,17 +1,11 @@
-export type YouTubeVideo = {
-  title: string;
-  channelTitle: string;
-  description: string;
-  tags: string[];
-  viewCount: string;
-  likeCount: string;
-};
+import { YouTubeVideoWithId } from "./claude";
 
-export async function fetchKoreaTrendingVideos(): Promise<YouTubeVideo[]> {
+export type { YouTubeVideoWithId };
+
+export async function fetchKoreaTrendingVideos(): Promise<YouTubeVideoWithId[]> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY is not set");
 
-  // Fetch top 20 trending videos in South Korea (regionCode=KR)
   const listUrl = new URL("https://www.googleapis.com/youtube/v3/videos");
   listUrl.searchParams.set("part", "snippet,statistics");
   listUrl.searchParams.set("chart", "mostPopular");
@@ -27,6 +21,7 @@ export async function fetchKoreaTrendingVideos(): Promise<YouTubeVideo[]> {
   const data = await res.json();
 
   return (data.items ?? []).map((item: any) => ({
+    id: item.id as string,
     title: item.snippet?.title ?? "",
     channelTitle: item.snippet?.channelTitle ?? "",
     description: (item.snippet?.description ?? "").slice(0, 300),

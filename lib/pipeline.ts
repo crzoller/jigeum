@@ -31,6 +31,9 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
   for (let i = 0; i < trends.length; i++) {
     const t = trends[i] as TrendInput;
     const rank = i + 1;
+    const imageUrl = t.youtube_video_id
+      ? `https://img.youtube.com/vi/${t.youtube_video_id}/maxresdefault.jpg`
+      : null;
 
     const existing = await sql`
       SELECT id FROM trends WHERE korean_name = ${t.korean_name} LIMIT 1
@@ -45,6 +48,8 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
           category = ${t.category},
           subcategory = ${t.subcategory},
           volume_score = ${t.volume_score},
+          youtube_video_id = ${t.youtube_video_id ?? null},
+          image_url = ${imageUrl},
           last_seen_at = ${today},
           rank = ${rank},
           is_active = true,
@@ -62,11 +67,13 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
       const newTrend = await sql`
         INSERT INTO trends (
           korean_name, english_name, description, category, subcategory,
-          first_seen_at, last_seen_at, is_active, rank, volume_score
+          first_seen_at, last_seen_at, is_active, rank, volume_score,
+          youtube_video_id, image_url
         ) VALUES (
           ${t.korean_name}, ${t.english_name}, ${t.description},
           ${t.category}, ${t.subcategory},
-          ${today}, ${today}, true, ${rank}, ${t.volume_score}
+          ${today}, ${today}, true, ${rank}, ${t.volume_score},
+          ${t.youtube_video_id ?? null}, ${imageUrl}
         )
         RETURNING id
       `;
