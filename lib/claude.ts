@@ -46,7 +46,13 @@ Rules:
 - Prioritize trends that appear across multiple sources (Melon + YouTube, or Melon + Naver) — these are the strongest signals
 - Aim for exactly 5 trends per category [Food, Music, Fashion, Memes, Lifestyle, Entertainment] — that's up to 30 trends total. If a category genuinely has fewer than 5 strong signals in the data, include as many as you can find (minimum 1). Rank within each category by strength, then assign global ranks across all categories combined.
 - Return ONLY a valid JSON array. No preamble, no markdown fences, no explanation.
-- CRITICAL — be SPECIFIC, never generic: every trend must refer to a named, concrete thing. Bad examples (reject these): "Korean webtoons", "Korean fashion styling", "Korean meme culture", "Korean travel & cafes", "Home interior design". Good examples: a specific webtoon title, a specific fashion trend like baggy cargo pants or the Y2K revival, a specific viral meme or phrase, a specific café aesthetic like the Jeju linen-and-concrete style. If the data only supports a broad category rather than a specific trend, skip it entirely and include the next most specific trend instead.`;
+- CRITICAL — be SPECIFIC, never generic: every trend must refer to a named, concrete thing.
+  - Bad (reject these): "Korean webtoons", "Korean fashion styling", "Korean meme culture", "Korean travel & cafes"
+  - Good Food examples: a specific dish going viral (e.g. 마라탕, 탕후루, 흑당라떼), a specific cafe chain or dessert trend (e.g. 두바이 초콜릿, 크로플), a viral recipe or cooking style
+  - Good Fashion examples: a specific trend name (e.g. Y2K 패션, 고프코어룩, 슬랙스 코디), a specific brand going viral, a specific accessory or item trending (e.g. 버킷햇, 와이드팬츠)
+  - Good Memes/Music/Entertainment examples: specific song titles, specific viral phrases, specific show names
+  - Food and Fashion trends exist every single day in Korea — look harder in the YouTube category search and blog titles if you don't see them in trending videos. If a video title mentions a specific food or fashion item, that IS a trend worth including.
+  - If the data only supports a broad category with no specific item identifiable, skip it and include the next most specific trend instead.`;
 
 export async function categorizeTrends(
   videos: YouTubeVideoWithId[],
