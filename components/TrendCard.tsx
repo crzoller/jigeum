@@ -37,13 +37,13 @@ export default function TrendCard({ trend }: Props) {
       )}
 
       <div className="p-4 flex flex-col gap-3">
-        {/* Rank */}
+        {/* Rank + category */}
         <div className="flex items-center justify-between">
           <span
-            className="text-[11px] font-semibold tabular-nums"
-            style={{ color: "#E8453C" }}
+            className="text-[11px] font-semibold tracking-widest uppercase"
+            style={{ color: "#E8453C", letterSpacing: "0.10em" }}
           >
-            #{trend.rank}
+            #1 {trend.category}
           </span>
           <span className="text-[11px]" style={{ color: "var(--text-hint)" }}>
             {expanded ? "↑" : "↓"}
@@ -93,18 +93,6 @@ export default function TrendCard({ trend }: Props) {
           </div>
         )}
 
-        {/* Footer */}
-        <div className="flex items-center justify-between mt-auto">
-          <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-            style={{
-              background: "rgba(255,255,255,0.06)",
-              color: "var(--text-muted)",
-            }}
-          >
-            {trend.category}
-          </span>
-        </div>
       </div>
     </div>
   );
