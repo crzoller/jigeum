@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import { Trend } from "@/lib/mock-data";
-import DaysBadge from "./DaysBadge";
 import TrendMedia from "./TrendMedia";
 import TrendLinks from "./TrendLinks";
 
 type Props = {
   trend: Trend;
+  label?: string;
 };
 
-export default function HeroCard({ trend }: Props) {
+export default function HeroCard({ trend, label }: Props) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -44,7 +44,7 @@ export default function HeroCard({ trend }: Props) {
             className="text-[11px] font-semibold tracking-widest uppercase"
             style={{ color: "#E8453C", letterSpacing: "0.12em" }}
           >
-            #1 Trending
+            {label ?? "#1 Trending"}
           </span>
           <div className="flex items-center gap-2">
             <span
@@ -115,8 +115,7 @@ export default function HeroCard({ trend }: Props) {
         )}
 
         {/* Footer row */}
-        <div className="flex items-center justify-between mt-4">
-          <DaysBadge days={trend.days_trending} />
+        <div className="flex items-center justify-end mt-4">
           <div className="flex items-center gap-2">
             <span className="text-[11px]" style={{ color: "var(--text-hint)" }}>
               Trend intensity

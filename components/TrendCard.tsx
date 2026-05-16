@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Trend } from "@/lib/mock-data";
-import DaysBadge from "./DaysBadge";
 import TrendMedia from "./TrendMedia";
 import TrendLinks from "./TrendLinks";
 
@@ -105,7 +104,6 @@ export default function TrendCard({ trend }: Props) {
           >
             {trend.category}
           </span>
-          <DaysBadge days={trend.days_trending} size="sm" />
         </div>
       </div>
     </div>

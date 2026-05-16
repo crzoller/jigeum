@@ -51,13 +51,7 @@ export default function TrendRow({ trend }: Props) {
         {/* Right: sparkline + days + chevron */}
         <div className="flex items-center gap-3 shrink-0">
           <Sparkline values={trend.snapshots} height={16} />
-          <span
-            className="text-[11px] tabular-nums w-8 text-right"
-            style={{ color: "var(--text-muted)" }}
-          >
-            {trend.days_trending}d
-          </span>
-          <span
+<span
             className="text-[11px] w-3"
             style={{ color: "var(--text-hint)" }}
           >

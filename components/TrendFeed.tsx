@@ -5,24 +5,45 @@ import { Trend, CATEGORIES } from "@/lib/mock-data";
 import CategoryTabs from "./CategoryTabs";
 import HeroCard from "./HeroCard";
 import TrendGrid from "./TrendGrid";
-import TrendRow from "./TrendRow";
 
 type Props = {
   trends: Trend[];
 };
 
-function filterTrends(trends: Trend[], category: string): Trend[] {
-  if (category === "All") return trends;
-  return trends.filter((t) => t.category === category);
+const CATEGORY_ORDER = ["Music", "Food", "Fashion", "Entertainment", "Memes", "Lifestyle"];
+
+/** All tab: one best trend per category, sorted by global rank so the hero is the strongest overall */
+function getCategoryChampions(trends: Trend[]): Trend[] {
+  const byCategory: Record<string, Trend> = {};
+  for (const trend of trends) {
+    if (!byCategory[trend.category]) {
+      byCategory[trend.category] = trend; // trends are already sorted by rank from DB
+    }
+  }
+  return CATEGORY_ORDER
+    .filter((cat) => byCategory[cat])
+    .map((cat) => byCategory[cat])
+    .sort((a, b) => a.rank - b.rank);
+}
+
+/** Category tab: top 5 in the category, renumbered #1–#5 */
+function getCategoryTop5(trends: Trend[], category: string): Trend[] {
+  return trends
+    .filter((t) => t.category === category)
+    .slice(0, 5)
+    .map((t, i) => ({ ...t, rank: i + 1 }));
 }
 
 export default function TrendFeed({ trends }: Props) {
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const filtered = filterTrends(trends, activeCategory);
-  const hero = filtered[0] ?? null;
-  const grid = filtered.slice(1, 5);
-  const rows = filtered.slice(5);
+  const displayTrends =
+    activeCategory === "All"
+      ? getCategoryChampions(trends)
+      : getCategoryTop5(trends, activeCategory);
+
+  const hero = displayTrends[0] ?? null;
+  const grid = displayTrends.slice(1);
 
   return (
     <div>
@@ -38,34 +59,14 @@ export default function TrendFeed({ trends }: Props) {
           </p>
         )}
 
-        {hero && <HeroCard trend={hero} />}
+        {hero && (
+          <HeroCard
+            trend={hero}
+            label={activeCategory === "All" ? "#1 Trending" : `#1 in ${activeCategory}`}
+          />
+        )}
 
         {grid.length > 0 && <TrendGrid trends={grid} />}
-
-        {rows.length > 0 && (
-          <div
-            className="rounded-xl overflow-hidden"
-            style={{
-              backgroundColor: "#111111",
-              border: "0.5px solid var(--border)",
-            }}
-          >
-            <div
-              className="px-4 py-2"
-              style={{ borderBottom: "0.5px solid var(--border)" }}
-            >
-              <span
-                className="text-[10px] font-semibold tracking-widest uppercase"
-                style={{ color: "var(--text-hint)", letterSpacing: "0.12em" }}
-              >
-                Also trending
-              </span>
-            </div>
-            {rows.map((trend) => (
-              <TrendRow key={trend.id} trend={trend} />
-            ))}
-          </div>
-        )}
 
         <p
           className="text-center text-[11px] pb-4"
