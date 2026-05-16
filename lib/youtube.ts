@@ -10,7 +10,7 @@ export async function fetchKoreaTrendingVideos(): Promise<YouTubeVideoWithId[]> 
   listUrl.searchParams.set("part", "snippet,statistics");
   listUrl.searchParams.set("chart", "mostPopular");
   listUrl.searchParams.set("regionCode", "KR");
-  listUrl.searchParams.set("maxResults", "20");
+  listUrl.searchParams.set("maxResults", "50");
   listUrl.searchParams.set("key", apiKey);
 
   const res = await fetch(listUrl.toString());

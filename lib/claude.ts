@@ -40,7 +40,7 @@ Rules:
 - Skip news, politics, sports scores, and ads
 - Focus on cultural moments: food, music, fashion, memes, lifestyle, entertainment
 - Prioritize trends that appear in BOTH YouTube and Naver data — these are the strongest signals
-- Return 8-12 trends maximum, ranked by cultural significance
+- Aim for exactly 5 trends per category [Food, Music, Fashion, Memes, Lifestyle, Entertainment] — that's up to 30 trends total. If a category genuinely has fewer than 5 strong signals in the data, include as many as you can find (minimum 1). Rank within each category by strength, then assign global ranks across all categories combined.
 - Return ONLY a valid JSON array. No preamble, no markdown fences, no explanation.
 - CRITICAL — be SPECIFIC, never generic: every trend must refer to a named, concrete thing. Bad examples (reject these): "Korean webtoons", "Korean fashion styling", "Korean meme culture", "Korean travel & cafes", "Home interior design". Good examples: a specific webtoon title, a specific fashion trend like baggy cargo pants or the Y2K revival, a specific viral meme or phrase, a specific café aesthetic like the Jeju linen-and-concrete style. If the data only supports a broad category rather than a specific trend, skip it entirely and include the next most specific trend instead.`;
 
@@ -63,7 +63,7 @@ export async function categorizeTrends(
 
   const message = await client.messages.create({
     model: "claude-opus-4-5",
-    max_tokens: 4096,
+    max_tokens: 8192,
     system: SYSTEM_PROMPT,
     messages: [
       {
