@@ -79,17 +79,17 @@ export default function TrendCard({ trend }: Props) {
             className="flex flex-col gap-3"
             onClick={(e) => e.stopPropagation()}
           >
+            <TrendMedia
+              youtubeVideoId={trend.youtube_video_id}
+              imageUrl={trend.image_url}
+              title={trend.korean_name}
+            />
             <p
               className="text-[12px] leading-relaxed"
               style={{ color: "var(--text-muted)" }}
             >
               {trend.description}
             </p>
-            <TrendMedia
-              youtubeVideoId={trend.youtube_video_id}
-              imageUrl={trend.image_url}
-              title={trend.korean_name}
-            />
             <TrendLinks
               koreanName={trend.korean_name}
               englishName={trend.english_name}
