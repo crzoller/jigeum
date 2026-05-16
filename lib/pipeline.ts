@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import { fetchKoreaTrendingVideos } from "./youtube";
 import { fetchNaverTrends } from "./naver";
+import { fetchMelonChart, MelonTrack } from "./melon";
 import { categorizeTrends, TrendInput } from "./claude";
 
 export async function runPipeline(): Promise<{ inserted: number; updated: number; deactivated: number }> {
@@ -17,11 +18,20 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
     naverKeywords = await fetchNaverTrends();
     console.log(`  → Got ${naverKeywords.length} Naver keywords`);
   } catch (err) {
-    console.warn("  ⚠ Naver fetch failed, continuing with YouTube only:", err);
+    console.warn("  ⚠ Naver fetch failed, continuing without it:", err);
   }
 
-  console.log("Step 3: Sending to Claude for categorization...");
-  const trends = await categorizeTrends(videos, naverKeywords);
+  console.log("Step 3: Fetching Melon Top 50 chart...");
+  let melonTracks: MelonTrack[] = [];
+  try {
+    melonTracks = await fetchMelonChart(50);
+    console.log(`  → Got ${melonTracks.length} Melon tracks`);
+  } catch (err) {
+    console.warn("  ⚠ Melon fetch failed, continuing without it:", err);
+  }
+
+  console.log("Step 4: Sending to Claude for categorization...");
+  const trends = await categorizeTrends(videos, naverKeywords, melonTracks);
   console.log(`  → Got ${trends.length} trends back`);
 
   let inserted = 0;

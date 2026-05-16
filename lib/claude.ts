@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { MelonTrack } from "./melon";
 
 export type YouTubeVideoWithId = {
   id: string;
@@ -39,14 +40,16 @@ Rules:
 - Consolidate similar items (e.g. multiple videos from one K-pop group = one trend)
 - Skip news, politics, sports scores, and ads
 - Focus on cultural moments: food, music, fashion, memes, lifestyle, entertainment
-- Prioritize trends that appear in BOTH YouTube and Naver data — these are the strongest signals
+- For Music trends, treat the Melon chart as the most authoritative source — it is Korea's #1 streaming platform. A song in the Melon Top 10 is more significant than a YouTube view count.
+- Prioritize trends that appear across multiple sources (Melon + YouTube, or Melon + Naver) — these are the strongest signals
 - Aim for exactly 5 trends per category [Food, Music, Fashion, Memes, Lifestyle, Entertainment] — that's up to 30 trends total. If a category genuinely has fewer than 5 strong signals in the data, include as many as you can find (minimum 1). Rank within each category by strength, then assign global ranks across all categories combined.
 - Return ONLY a valid JSON array. No preamble, no markdown fences, no explanation.
 - CRITICAL — be SPECIFIC, never generic: every trend must refer to a named, concrete thing. Bad examples (reject these): "Korean webtoons", "Korean fashion styling", "Korean meme culture", "Korean travel & cafes", "Home interior design". Good examples: a specific webtoon title, a specific fashion trend like baggy cargo pants or the Y2K revival, a specific viral meme or phrase, a specific café aesthetic like the Jeju linen-and-concrete style. If the data only supports a broad category rather than a specific trend, skip it entirely and include the next most specific trend instead.`;
 
 export async function categorizeTrends(
   videos: YouTubeVideoWithId[],
-  naverKeywords: { keyword: string; ratio: number }[] = []
+  naverKeywords: { keyword: string; ratio: number }[] = [],
+  melonTracks: MelonTrack[] = []
 ): Promise<TrendInput[]> {
   const youtubeData = videos
     .map(
@@ -61,6 +64,12 @@ export async function categorizeTrends(
         .join("\n")
     : "No Naver data available.";
 
+  const melonData = melonTracks.length > 0
+    ? melonTracks
+        .map((t) => `${t.rank}. "${t.title}" by ${t.artist}`)
+        .join("\n")
+    : "No Melon data available.";
+
   const message = await client.messages.create({
     model: "claude-opus-4-5",
     max_tokens: 8192,
@@ -68,7 +77,10 @@ export async function categorizeTrends(
     messages: [
       {
         role: "user",
-        content: `Here is today's trending data from South Korea. Analyze both sources and return structured trend objects.
+        content: `Here is today's trending data from South Korea. Analyze all sources and return structured trend objects.
+
+## Melon Top 50 (Korea's #1 music streaming chart — most authoritative for Music trends):
+${melonData}
 
 ## YouTube Korea Trending Videos (include the video ID in your response):
 ${youtubeData}
@@ -76,7 +88,7 @@ ${youtubeData}
 ## Naver Search Term Trends (Korea):
 ${naverData}
 
-Return structured trend objects covering the most significant cultural trends across both sources.`,
+Return structured trend objects covering the most significant cultural trends across all sources.`,
       },
     ],
   });
