@@ -9,6 +9,7 @@ type Props = {
   trend: Trend;
   label?: string;
   initialExpanded?: boolean;
+  alwaysExpanded?: boolean;
 };
 
 function Chevron({ expanded }: { expanded: boolean }) {
@@ -35,20 +36,21 @@ function Chevron({ expanded }: { expanded: boolean }) {
   );
 }
 
-export default function HeroCard({ trend, label, initialExpanded = false }: Props) {
+export default function HeroCard({ trend, label, initialExpanded = false, alwaysExpanded = false }: Props) {
   const [expanded, setExpanded] = useState(initialExpanded);
+  const isExpanded = alwaysExpanded || expanded;
 
   return (
     <div
-      className="w-full rounded-xl overflow-hidden cursor-pointer"
+      className={`w-full rounded-xl overflow-hidden ${alwaysExpanded ? "" : "cursor-pointer"}`}
       style={{
         backgroundColor: "#111111",
         border: "0.5px solid var(--border)",
       }}
-      onClick={() => setExpanded((e) => !e)}
+      onClick={alwaysExpanded ? undefined : () => setExpanded((e) => !e)}
     >
-      {/* Thumbnail — only when collapsed */}
-      {trend.image_url && !expanded && (
+      {/* Thumbnail — only when collapsed and not alwaysExpanded */}
+      {trend.image_url && !isExpanded && (
         <div
           className="w-full overflow-hidden"
           style={{ aspectRatio: "16/9", backgroundColor: "#161616" }}
@@ -105,7 +107,7 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
         </p>
 
         {/* Expanded content */}
-        {expanded && (
+        {isExpanded && (
           <div
             className="flex flex-col gap-4"
             onClick={(e) => e.stopPropagation()}
@@ -128,10 +130,12 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
           </div>
         )}
 
-        {/* Chevron at bottom center */}
-        <div className="flex justify-center pt-3">
-          <Chevron expanded={expanded} />
-        </div>
+        {/* Chevron at bottom center — hidden when always expanded */}
+        {!alwaysExpanded && (
+          <div className="flex justify-center pt-3">
+            <Chevron expanded={expanded} />
+          </div>
+        )}
       </div>
     </div>
   );

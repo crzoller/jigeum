@@ -67,6 +67,7 @@ export default function TrendFeed({ trends }: Props) {
             trend={hero}
             label={`#1 ${hero.category}`}
             initialExpanded={!isAll}
+            alwaysExpanded={isAll}
           />
         )}
 
