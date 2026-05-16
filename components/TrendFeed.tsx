@@ -5,6 +5,7 @@ import { Trend, CATEGORIES } from "@/lib/mock-data";
 import CategoryTabs from "./CategoryTabs";
 import HeroCard from "./HeroCard";
 import TrendGrid from "./TrendGrid";
+import TrendRow from "./TrendRow";
 
 type Props = {
   trends: Trend[];
@@ -42,8 +43,9 @@ export default function TrendFeed({ trends }: Props) {
       ? getCategoryChampions(trends)
       : getCategoryTop5(trends, activeCategory);
 
+  const isAll = activeCategory === "All";
   const hero = displayTrends[0] ?? null;
-  const grid = displayTrends.slice(1);
+  const rest = displayTrends.slice(1);
 
   return (
     <div>
@@ -61,12 +63,30 @@ export default function TrendFeed({ trends }: Props) {
 
         {hero && (
           <HeroCard
+            key={`${activeCategory}-hero`}
             trend={hero}
-            label={activeCategory === "All" ? "#1 Trending" : `#1 in ${activeCategory}`}
+            label={isAll ? "#1 Trending" : `#1 in ${activeCategory}`}
+            initialExpanded={!isAll}
           />
         )}
 
-        {grid.length > 0 && <TrendGrid trends={grid} />}
+        {/* All tab: side-by-side category champion cards */}
+        {isAll && rest.length > 0 && <TrendGrid trends={rest} />}
+
+        {/* Category tab: stacked expandable rows */}
+        {!isAll && rest.length > 0 && (
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              backgroundColor: "#111111",
+              border: "0.5px solid var(--border)",
+            }}
+          >
+            {rest.map((trend) => (
+              <TrendRow key={trend.id} trend={trend} />
+            ))}
+          </div>
+        )}
 
         <p
           className="text-center text-[11px] pb-4"

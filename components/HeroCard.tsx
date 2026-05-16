@@ -8,10 +8,11 @@ import TrendLinks from "./TrendLinks";
 type Props = {
   trend: Trend;
   label?: string;
+  initialExpanded?: boolean;
 };
 
-export default function HeroCard({ trend, label }: Props) {
-  const [expanded, setExpanded] = useState(false);
+export default function HeroCard({ trend, label, initialExpanded = false }: Props) {
+  const [expanded, setExpanded] = useState(initialExpanded);
 
   return (
     <div
