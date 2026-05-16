@@ -11,6 +11,30 @@ type Props = {
   initialExpanded?: boolean;
 };
 
+function Chevron({ expanded }: { expanded: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      style={{
+        transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 0.2s ease",
+        color: "var(--text-hint)",
+      }}
+    >
+      <path
+        d="M4 6L8 10L12 6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function HeroCard({ trend, label, initialExpanded = false }: Props) {
   const [expanded, setExpanded] = useState(initialExpanded);
 
@@ -23,7 +47,7 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
       }}
       onClick={() => setExpanded((e) => !e)}
     >
-      {/* Thumbnail — always visible */}
+      {/* Thumbnail — only when collapsed */}
       {trend.image_url && !expanded && (
         <div
           className="w-full overflow-hidden"
@@ -39,7 +63,7 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
       )}
 
       <div className="p-5">
-        {/* Rank + category */}
+        {/* Label + subcategory pill */}
         <div className="flex items-center justify-between mb-4">
           <span
             className="text-[11px] font-semibold tracking-widest uppercase"
@@ -47,7 +71,7 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
           >
             {label ?? "#1 Trending"}
           </span>
-          <div className="flex items-center gap-2">
+          {trend.subcategory && (
             <span
               className="px-2 py-0.5 rounded-full text-[11px] font-medium"
               style={{
@@ -57,13 +81,7 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
             >
               {trend.subcategory}
             </span>
-            <span
-              className="text-[11px]"
-              style={{ color: "var(--text-hint)" }}
-            >
-              {expanded ? "↑" : "↓"}
-            </span>
-          </div>
+          )}
         </div>
 
         {/* Korean name */}
@@ -92,22 +110,17 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
             className="flex flex-col gap-4"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Video / image */}
             <TrendMedia
               youtubeVideoId={trend.youtube_video_id}
               imageUrl={trend.image_url}
               title={trend.korean_name}
             />
-
-            {/* Description */}
             <p
               className="text-[14px] leading-relaxed"
               style={{ color: "var(--text-muted)" }}
             >
               {trend.description}
             </p>
-
-            {/* Links */}
             <TrendLinks
               koreanName={trend.korean_name}
               englishName={trend.english_name}
@@ -115,6 +128,10 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
           </div>
         )}
 
+        {/* Chevron at bottom center */}
+        <div className="flex justify-center pt-3">
+          <Chevron expanded={expanded} />
+        </div>
       </div>
     </div>
   );

@@ -9,6 +9,30 @@ type Props = {
   trend: Trend;
 };
 
+function Chevron({ expanded }: { expanded: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      style={{
+        transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 0.2s ease",
+        color: "var(--text-hint)",
+      }}
+    >
+      <path
+        d="M3 5L7 9L11 5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function TrendCard({ trend }: Props) {
   const [expanded, setExpanded] = useState(false);
 
@@ -21,34 +45,14 @@ export default function TrendCard({ trend }: Props) {
       }}
       onClick={() => setExpanded((e) => !e)}
     >
-      {/* Thumbnail */}
-      {trend.image_url && (
-        <div
-          className="w-full overflow-hidden"
-          style={{ aspectRatio: "16/9", backgroundColor: "#161616" }}
-        >
-          <img
-            src={trend.image_url}
-            alt={trend.korean_name}
-            className="w-full h-full object-cover"
-            style={{ opacity: 0.85 }}
-          />
-        </div>
-      )}
-
       <div className="p-4 flex flex-col gap-3">
         {/* Rank + category */}
-        <div className="flex items-center justify-between">
-          <span
-            className="text-[11px] font-semibold tracking-widest uppercase"
-            style={{ color: "#E8453C", letterSpacing: "0.10em" }}
-          >
-            #1 {trend.category}
-          </span>
-          <span className="text-[11px]" style={{ color: "var(--text-hint)" }}>
-            {expanded ? "↑" : "↓"}
-          </span>
-        </div>
+        <span
+          className="text-[11px] font-semibold tracking-widest uppercase"
+          style={{ color: "#E8453C", letterSpacing: "0.10em" }}
+        >
+          #1 {trend.category}
+        </span>
 
         {/* Names */}
         <div className="flex flex-col gap-0.5">
@@ -75,17 +79,17 @@ export default function TrendCard({ trend }: Props) {
             className="flex flex-col gap-3"
             onClick={(e) => e.stopPropagation()}
           >
-            <TrendMedia
-              youtubeVideoId={trend.youtube_video_id}
-              imageUrl={trend.image_url}
-              title={trend.korean_name}
-            />
             <p
               className="text-[12px] leading-relaxed"
               style={{ color: "var(--text-muted)" }}
             >
               {trend.description}
             </p>
+            <TrendMedia
+              youtubeVideoId={trend.youtube_video_id}
+              imageUrl={trend.image_url}
+              title={trend.korean_name}
+            />
             <TrendLinks
               koreanName={trend.korean_name}
               englishName={trend.english_name}
@@ -93,6 +97,10 @@ export default function TrendCard({ trend }: Props) {
           </div>
         )}
 
+        {/* Chevron at bottom center */}
+        <div className="flex justify-center pt-1">
+          <Chevron expanded={expanded} />
+        </div>
       </div>
     </div>
   );
