@@ -31,7 +31,7 @@ For each trend, provide:
 - english_name: short English translation or transliteration (max 4 words)
 - description: 2-3 sentences in English explaining what this is and why it's trending. Write for someone outside Korea who is curious but not an expert.
 - category: exactly one of [Food, Music, Fashion, Memes, Lifestyle, Entertainment]
-- subcategory: a more specific tag (e.g. "K-pop", "Street food", "TV drama", "Viral video", "Fitness")
+- subcategory: a specific tag that describes the type within the category. Use short, punchy labels (1-3 words). Examples by category — Food: "Street Food", "Dessert", "Snack", "Drink", "Restaurant Trend", "Recipe"; Music: "K-pop", "Hip-hop", "Ballad", "Indie", "OST", "Collab"; Fashion: "Streetwear", "Y2K", "Accessories", "Beauty", "Sneakers", "Hairstyle"; Memes: "Viral Phrase", "Dance Challenge", "Reaction Meme", "Parody", "Character"; Lifestyle: "Fitness", "Travel", "Cafe Culture", "Home Decor", "Self-care", "Study"; Entertainment: "TV Drama", "Variety Show", "Gaming", "Film", "Webtoon", "Celebrity"
 - volume_score: integer 0-100 representing relative trend strength based on view counts and search ratios
 - youtube_video_id: the YouTube video ID (e.g. "dQw4w9WgXcQ") of the most representative video for this trend from the list provided. Use null if no YouTube video matches.
 

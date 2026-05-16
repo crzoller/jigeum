@@ -115,32 +115,6 @@ export default function HeroCard({ trend, label, initialExpanded = false }: Prop
           </div>
         )}
 
-        {/* Footer row */}
-        <div className="flex items-center justify-end mt-4">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px]" style={{ color: "var(--text-hint)" }}>
-              Trend intensity
-            </span>
-            <div
-              className="h-[3px] w-20 rounded-full overflow-hidden"
-              style={{ backgroundColor: "var(--border)" }}
-            >
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${trend.volume_score}%`,
-                  backgroundColor: "#E8453C",
-                }}
-              />
-            </div>
-            <span
-              className="text-[11px] tabular-nums"
-              style={{ color: "var(--text-hint)" }}
-            >
-              {trend.volume_score}
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
