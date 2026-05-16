@@ -1,5 +1,5 @@
 import { neon } from "@neondatabase/serverless";
-import { fetchKoreaTrendingVideos } from "./youtube";
+import { fetchKoreaTrendingVideos, searchYouTubeVideo } from "./youtube";
 import { fetchNaverTrends } from "./naver";
 import { fetchMelonChart, MelonTrack } from "./melon";
 import { categorizeTrends, TrendInput } from "./claude";
@@ -33,6 +33,20 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
   console.log("Step 4: Sending to Claude for categorization...");
   const trends = await categorizeTrends(videos, naverKeywords, melonTracks);
   console.log(`  → Got ${trends.length} trends back`);
+
+  console.log("Step 5: Filling in YouTube video IDs for Music trends...");
+  for (const trend of trends) {
+    if (trend.category === "Music" && !trend.youtube_video_id) {
+      const query = `${trend.korean_name} ${trend.english_name} official MV`;
+      const videoId = await searchYouTubeVideo(query);
+      if (videoId) {
+        trend.youtube_video_id = videoId;
+        console.log(`  ✓ Found video for: ${trend.korean_name} → ${videoId}`);
+      } else {
+        console.log(`  – No video found for: ${trend.korean_name}`);
+      }
+    }
+  }
 
   let inserted = 0;
   let updated = 0;

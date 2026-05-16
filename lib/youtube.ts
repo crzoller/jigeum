@@ -2,6 +2,29 @@ import { YouTubeVideoWithId } from "./claude";
 
 export type { YouTubeVideoWithId };
 
+/** Search YouTube for a single video and return its ID. Returns null on failure. */
+export async function searchYouTubeVideo(query: string): Promise<string | null> {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) return null;
+
+  const url = new URL("https://www.googleapis.com/youtube/v3/search");
+  url.searchParams.set("part", "snippet");
+  url.searchParams.set("q", query);
+  url.searchParams.set("type", "video");
+  url.searchParams.set("maxResults", "1");
+  url.searchParams.set("regionCode", "KR");
+  url.searchParams.set("key", apiKey);
+
+  try {
+    const res = await fetch(url.toString());
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.items?.[0]?.id?.videoId as string) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchKoreaTrendingVideos(): Promise<YouTubeVideoWithId[]> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY is not set");
