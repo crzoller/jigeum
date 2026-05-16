@@ -1,6 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { fetchKoreaTrendingVideos, searchYouTubeVideo } from "./youtube";
-import { fetchNaverTrends } from "./naver";
+import { fetchNaverTrends, fetchNaverBlogTrends, NaverBlogResult } from "./naver";
 import { fetchMelonChart, MelonTrack } from "./melon";
 import { categorizeTrends, TrendInput } from "./claude";
 
@@ -18,7 +18,17 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
     naverKeywords = await fetchNaverTrends();
     console.log(`  → Got ${naverKeywords.length} Naver keywords`);
   } catch (err) {
-    console.warn("  ⚠ Naver fetch failed, continuing without it:", err);
+    console.warn("  ⚠ Naver DataLab fetch failed, continuing without it:", err);
+  }
+
+  console.log("Step 2b: Fetching Naver blog trends for Food & Fashion...");
+  let naverBlogTrends: NaverBlogResult[] = [];
+  try {
+    naverBlogTrends = await fetchNaverBlogTrends();
+    const total = naverBlogTrends.reduce((n, b) => n + b.titles.length, 0);
+    console.log(`  → Got ${total} blog titles across ${naverBlogTrends.length} categories`);
+  } catch (err) {
+    console.warn("  ⚠ Naver Blog fetch failed, continuing without it:", err);
   }
 
   console.log("Step 3: Fetching Melon Top 50 chart...");
@@ -31,7 +41,7 @@ export async function runPipeline(): Promise<{ inserted: number; updated: number
   }
 
   console.log("Step 4: Sending to Claude for categorization...");
-  const trends = await categorizeTrends(videos, naverKeywords, melonTracks);
+  const trends = await categorizeTrends(videos, naverKeywords, melonTracks, naverBlogTrends);
   console.log(`  → Got ${trends.length} trends back`);
 
   console.log("Step 5: Filling in YouTube video IDs for Music trends...");

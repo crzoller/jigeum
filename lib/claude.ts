@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { MelonTrack } from "./melon";
+import { NaverBlogResult } from "./naver";
 
 export type YouTubeVideoWithId = {
   id: string;
@@ -49,7 +50,8 @@ Rules:
 export async function categorizeTrends(
   videos: YouTubeVideoWithId[],
   naverKeywords: { keyword: string; ratio: number }[] = [],
-  melonTracks: MelonTrack[] = []
+  melonTracks: MelonTrack[] = [],
+  naverBlogTrends: NaverBlogResult[] = []
 ): Promise<TrendInput[]> {
   const youtubeData = videos
     .map(
@@ -70,6 +72,16 @@ export async function categorizeTrends(
         .join("\n")
     : "No Melon data available.";
 
+  const blogData = naverBlogTrends.length > 0
+    ? naverBlogTrends
+        .map(
+          (b) =>
+            `${b.category} blog titles:\n` +
+            b.titles.map((t) => `  - ${t}`).join("\n")
+        )
+        .join("\n\n")
+    : "No Naver blog data available.";
+
   const message = await client.messages.create({
     model: "claude-opus-4-5",
     max_tokens: 8192,
@@ -87,6 +99,9 @@ ${youtubeData}
 
 ## Naver Search Term Trends (Korea):
 ${naverData}
+
+## Naver Blog Post Titles — Food & Fashion (use these to identify specific trending items):
+${blogData}
 
 Return structured trend objects covering the most significant cultural trends across all sources.`,
       },
