@@ -65,7 +65,7 @@ export default function TrendFeed({ trends }: Props) {
           <HeroCard
             key={`${activeCategory}-hero`}
             trend={hero}
-            label={isAll ? "#1 Trending" : `#1 in ${activeCategory}`}
+            label={`#1 ${hero.category}`}
             initialExpanded={!isAll}
           />
         )}
